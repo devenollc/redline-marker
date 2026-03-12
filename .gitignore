@@ -1,0 +1,12 @@
+node_modules
+.vscode-test/
+out/
+*.vsix
+
+# Review files (optional - uncomment to keep reviews private)
+.claude/reviews/
+.claude/versions/
+
+# OS files
+.DS_Store
+Thumbs.db

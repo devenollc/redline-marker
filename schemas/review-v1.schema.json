@@ -1,0 +1,204 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://redline-mark.devenollc.com/schemas/v1",
+  "title": "Redline Mark File",
+  "description": "Schema for Redline Mark annotation files",
+  "type": "object",
+  "required": ["schemaVersion", "file", "fileHash", "createdAt", "updatedAt", "status", "comments", "claudeFeedback"],
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "Reference to this JSON schema"
+    },
+    "schemaVersion": {
+      "type": "number",
+      "description": "Schema version for migration support",
+      "const": 1
+    },
+    "file": {
+      "type": "string",
+      "description": "Relative path to the reviewed file from project root"
+    },
+    "fileHash": {
+      "type": "string",
+      "description": "SHA-256 hash of the file contents",
+      "pattern": "^sha256:[a-f0-9]{64}$"
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp when review was created"
+    },
+    "updatedAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp when review was last updated"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["draft", "in_review", "sent", "resolved"],
+      "description": "Current status of the review"
+    },
+    "comments": {
+      "type": "array",
+      "description": "Array of review comments",
+      "items": {
+        "type": "object",
+        "required": ["id", "line", "endLine", "author", "severity", "body", "createdAt", "resolved", "thread", "anchor", "anchorValid", "anchorLastChecked"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique comment identifier"
+          },
+          "line": {
+            "type": "number",
+            "minimum": 1,
+            "description": "Starting line number (1-indexed)"
+          },
+          "endLine": {
+            "type": "number",
+            "minimum": 1,
+            "description": "Ending line number (1-indexed)"
+          },
+          "author": {
+            "type": "string",
+            "enum": ["user", "claude"],
+            "description": "Comment author"
+          },
+          "authorEmail": {
+            "type": ["string", "null"],
+            "description": "Author email from git config"
+          },
+          "severity": {
+            "type": "string",
+            "enum": ["info", "question", "warning", "blocker"],
+            "description": "Comment severity level"
+          },
+          "body": {
+            "type": "string",
+            "description": "Comment text content"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "When comment was created"
+          },
+          "resolved": {
+            "type": "boolean",
+            "description": "Whether comment is resolved"
+          },
+          "resolvedAt": {
+            "type": ["string", "null"],
+            "format": "date-time",
+            "description": "When comment was resolved"
+          },
+          "resolvedBy": {
+            "type": ["string", "null"],
+            "enum": ["user", "claude", null],
+            "description": "Who resolved the comment"
+          },
+          "thread": {
+            "type": "array",
+            "description": "Reply thread",
+            "items": {
+              "type": "object",
+              "required": ["id", "author", "body", "createdAt"],
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "author": {
+                  "type": "string",
+                  "enum": ["user", "claude"]
+                },
+                "authorEmail": {
+                  "type": ["string", "null"]
+                },
+                "body": {
+                  "type": "string"
+                },
+                "createdAt": {
+                  "type": "string",
+                  "format": "date-time"
+                }
+              }
+            }
+          },
+          "anchor": {
+            "type": "object",
+            "required": ["line", "endLine", "contextBefore", "contextLine", "contextAfter", "contentHash", "createdAt"],
+            "properties": {
+              "line": {
+                "type": "number",
+                "minimum": 1
+              },
+              "endLine": {
+                "type": "number",
+                "minimum": 1
+              },
+              "contextBefore": {
+                "type": "string",
+                "description": "Line before target"
+              },
+              "contextLine": {
+                "type": "string",
+                "description": "The actual line(s) being commented on"
+              },
+              "contextAfter": {
+                "type": "string",
+                "description": "Line after target"
+              },
+              "contentHash": {
+                "type": "string",
+                "description": "Hash of context for quick comparison"
+              },
+              "createdAt": {
+                "type": "string",
+                "format": "date-time"
+              }
+            }
+          },
+          "anchorValid": {
+            "type": "boolean",
+            "description": "Whether anchor still points to correct location"
+          },
+          "anchorLastChecked": {
+            "type": "string",
+            "format": "date-time",
+            "description": "When anchor was last validated"
+          },
+          "anchorSuggestedLine": {
+            "type": "number",
+            "minimum": 1,
+            "description": "Suggested new line if content moved"
+          }
+        }
+      }
+    },
+    "claudeFeedback": {
+      "type": "object",
+      "required": ["sentAt", "mode", "responseFile", "status"],
+      "properties": {
+        "sentAt": {
+          "type": ["string", "null"],
+          "format": "date-time",
+          "description": "When feedback was sent to Claude"
+        },
+        "mode": {
+          "type": ["string", "null"],
+          "enum": ["revise", "converse", "new_version", null],
+          "description": "Feedback processing mode"
+        },
+        "responseFile": {
+          "type": ["string", "null"],
+          "description": "Path to Claude's response file"
+        },
+        "status": {
+          "type": ["string", "null"],
+          "enum": ["pending", "processing", "completed", "failed", null],
+          "description": "Processing status"
+        }
+      }
+    }
+  }
+}

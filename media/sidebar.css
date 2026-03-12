@@ -1,0 +1,244 @@
+body {
+  padding: 0;
+  margin: 0;
+  font-family: var(--vscode-font-family);
+  font-size: var(--vscode-font-size);
+  color: var(--vscode-foreground);
+  background-color: var(--vscode-sideBar-background);
+}
+
+#app {
+  padding: 10px;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--vscode-descriptionForeground);
+}
+
+.empty-state p {
+  margin: 10px 0;
+}
+
+.empty-state .hint {
+  font-size: 0.9em;
+  opacity: 0.8;
+}
+
+.empty-state code {
+  background-color: var(--vscode-textCodeBlock-background);
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-family: var(--vscode-editor-font-family);
+  font-size: 0.9em;
+}
+
+.review-card {
+  margin-bottom: 20px;
+  padding: 12px;
+  background-color: var(--vscode-editor-background);
+  border: 1px solid var(--vscode-panel-border);
+  border-radius: 6px;
+}
+
+.review-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.review-header h3 {
+  margin: 0;
+  font-size: 1.1em;
+  font-weight: 600;
+}
+
+.status-badge {
+  padding: 3px 8px;
+  border-radius: 12px;
+  font-size: 0.75em;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.status-badge.status-in_review {
+  background-color: var(--vscode-statusBarItem-warningBackground);
+  color: var(--vscode-statusBarItem-warningForeground);
+}
+
+.status-badge.status-sent {
+  background-color: var(--vscode-statusBarItem-prominentBackground);
+  color: var(--vscode-statusBarItem-prominentForeground);
+}
+
+.status-badge.status-resolved {
+  background-color: var(--vscode-statusBarItem-activeBackground);
+  color: var(--vscode-statusBarItem-activeForeground);
+}
+
+.review-stats {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 12px;
+  font-size: 0.9em;
+  color: var(--vscode-descriptionForeground);
+}
+
+.stat {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.comments-list {
+  margin-bottom: 12px;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.comment {
+  padding: 8px;
+  margin-bottom: 8px;
+  background-color: var(--vscode-input-background);
+  border-left: 3px solid var(--vscode-inputValidation-infoBorder);
+  border-radius: 3px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.comment:hover {
+  background-color: var(--vscode-list-hoverBackground);
+}
+
+.comment.resolved {
+  opacity: 0.6;
+  border-left-color: var(--vscode-inputValidation-warningBorder);
+}
+
+.comment-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+  font-size: 0.85em;
+}
+
+.severity {
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.75em;
+}
+
+.severity.severity-info {
+  background-color: var(--vscode-statusBarItem-prominentBackground);
+  color: var(--vscode-statusBarItem-prominentForeground);
+}
+
+.severity.severity-question {
+  background-color: var(--vscode-inputValidation-infoBorder);
+  color: var(--vscode-input-foreground);
+}
+
+.severity.severity-warning {
+  background-color: var(--vscode-inputValidation-warningBorder);
+  color: var(--vscode-input-foreground);
+}
+
+.severity.severity-blocker {
+  background-color: var(--vscode-inputValidation-errorBorder);
+  color: var(--vscode-input-foreground);
+}
+
+.line-number {
+  color: var(--vscode-descriptionForeground);
+}
+
+.resolved-badge {
+  margin-left: auto;
+  color: var(--vscode-gitDecoration-addedResourceForeground);
+  font-weight: bold;
+}
+
+.comment-body {
+  font-size: 0.9em;
+  line-height: 1.4;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.reply-count {
+  margin-top: 6px;
+  font-size: 0.8em;
+  color: var(--vscode-descriptionForeground);
+  font-style: italic;
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.mode-select {
+  flex: 1;
+  padding: 6px 8px;
+  background-color: var(--vscode-input-background);
+  color: var(--vscode-input-foreground);
+  border: 1px solid var(--vscode-input-border);
+  border-radius: 3px;
+  font-size: 0.9em;
+  cursor: pointer;
+}
+
+.mode-select:focus {
+  outline: 1px solid var(--vscode-focusBorder);
+}
+
+.primary-button {
+  padding: 6px 16px;
+  background-color: var(--vscode-button-background);
+  color: var(--vscode-button-foreground);
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.9em;
+  white-space: nowrap;
+}
+
+.primary-button:hover {
+  background-color: var(--vscode-button-hoverBackground);
+}
+
+.primary-button:active {
+  background-color: var(--vscode-button-background);
+  opacity: 0.8;
+}
+
+.feedback-status {
+  margin-top: 12px;
+  padding: 8px;
+  border-radius: 3px;
+  font-size: 0.85em;
+  background-color: var(--vscode-inputValidation-infoBackground);
+  border: 1px solid var(--vscode-inputValidation-infoBorder);
+}
+
+.feedback-status.status-pending {
+  background-color: var(--vscode-inputValidation-warningBackground);
+  border-color: var(--vscode-inputValidation-warningBorder);
+}
+
+.feedback-status.status-completed {
+  background-color: var(--vscode-inputValidation-infoBackground);
+  border-color: var(--vscode-inputValidation-infoBorder);
+}
+
+.feedback-status.status-failed {
+  background-color: var(--vscode-inputValidation-errorBackground);
+  border-color: var(--vscode-inputValidation-errorBorder);
+}
