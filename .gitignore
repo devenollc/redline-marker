@@ -3,10 +3,11 @@ node_modules
 out/
 *.vsix
 
-# Review files (optional - uncomment to keep reviews private)
-.claude/reviews/
-.claude/versions/
+# Review data
+.redline/
 
 # OS files
 .DS_Store
 Thumbs.db
+
+publish.md

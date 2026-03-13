@@ -19,7 +19,7 @@
       app.innerHTML = `
         <div class="empty-state">
           <p>No active reviews</p>
-          <p class="hint">Open a file with <code>Cmd+Shift+P → Claude Review: Open in Review Mode</code></p>
+          <p class="hint">Open a file with <code>Cmd+Shift+P → Redline Mark: Open in Redline Mark Mode</code></p>
         </div>
       `;
       return;
@@ -29,7 +29,6 @@
       <div class="review-card">
         <div class="review-header">
           <h3>${escapeHtml(review.fileName)}</h3>
-          <span class="status-badge status-${review.status}">${review.status}</span>
         </div>
 
         <div class="review-stats">
@@ -40,7 +39,9 @@
         <div class="comments-list">
           ${review.comments.map(comment => `
             <div class="comment ${comment.resolved ? 'resolved' : ''}"
-                 onclick="jumpToComment('${review.filePath}', ${comment.line})">
+                 data-action="jump"
+                 data-file="${escapeHtml(review.filePath)}"
+                 data-line="${comment.line}">
               <div class="comment-header">
                 <span class="severity severity-${comment.severity}">${comment.severity}</span>
                 <span class="line-number">Line ${comment.line}</span>
@@ -48,17 +49,20 @@
               </div>
               <div class="comment-body">${escapeHtml(truncate(comment.body, 80))}</div>
               ${comment.replyCount > 0 ? `<div class="reply-count">${comment.replyCount} ${comment.replyCount === 1 ? 'reply' : 'replies'}</div>` : ''}
+              ${!comment.resolved ? `
+                <button class="resolve-btn"
+                        data-action="resolve"
+                        data-comment-id="${escapeHtml(comment.id)}">
+                  Resolve
+                </button>` : ''}
             </div>
           `).join('')}
         </div>
 
         <div class="actions">
-          <select id="mode-${escapeHtml(review.filePath)}" class="mode-select">
-            <option value="revise">Revise Plan</option>
-            <option value="converse">Converse</option>
-            <option value="new_version">New Version</option>
-          </select>
-          <button onclick="sendToClaude('${escapeHtml(review.filePath)}')" class="primary-button">
+          <button data-action="send"
+                  data-file="${escapeHtml(review.filePath)}"
+                  class="primary-button">
             Send to Claude
           </button>
         </div>
@@ -73,28 +77,36 @@
     `).join('');
   }
 
-  window.sendToClaude = function(filePath) {
-    const modeSelect = document.getElementById(`mode-${filePath}`);
-    const mode = modeSelect.value;
+  // Event delegation — handles all clicks inside #app without inline handlers
+  document.getElementById('app').addEventListener('click', (e) => {
+    const target = e.target.closest('[data-action]');
+    if (!target) return;
 
-    vscode.postMessage({
-      command: 'sendToClaude',
-      filePath,
-      mode
-    });
-  };
+    const action = target.dataset.action;
 
-  window.jumpToComment = function(filePath, line) {
-    vscode.postMessage({
-      command: 'jumpToComment',
-      filePath,
-      line
-    });
-  };
+    if (action === 'jump') {
+      vscode.postMessage({
+        command: 'jumpToComment',
+        filePath: target.dataset.file,
+        line: parseInt(target.dataset.line, 10)
+      });
+    } else if (action === 'resolve') {
+      e.stopPropagation(); // prevent jump from also firing
+      vscode.postMessage({
+        command: 'resolveComment',
+        commentId: target.dataset.commentId
+      });
+    } else if (action === 'send') {
+      vscode.postMessage({
+        command: 'sendToClaude',
+        filePath: target.dataset.file
+      });
+    }
+  });
 
   function escapeHtml(text) {
     const div = document.createElement('div');
-    div.textContent = text;
+    div.textContent = String(text);
     return div.innerHTML;
   }
 

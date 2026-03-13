@@ -34,8 +34,28 @@
         "command": "redline-mark.addReply",
         "title": "Reply to Comment",
         "category": "Redline Mark"
+      },
+      {
+        "command": "redline-mark.createComment",
+        "title": "Add Comment",
+        "category": "Redline Mark",
+        "enablement": "!commentIsEmpty"
+      },
+      {
+        "command": "redline-mark.closeReview",
+        "title": "Close Review",
+        "category": "Redline Mark"
       }
     ],
+    "menus": {
+      "comments/commentThread/context": [
+        {
+          "command": "redline-mark.createComment",
+          "when": "commentController == redline-mark",
+          "group": "inline"
+        }
+      ]
+    },
     "viewsContainers": {
       "activitybar": [{
         "id": "redline-mark-sidebar",
@@ -67,6 +87,12 @@
           "type": "boolean",
           "default": true,
           "description": "Watch for external changes to review files"
+        },
+        "redlineMark.excludePatterns": {
+          "type": "array",
+          "items": { "type": "string" },
+          "default": [],
+          "description": "Glob patterns to exclude from the file picker (e.g. \"**/CHANGELOG.md\", \"**/node_modules/**\")"
         }
       }
     }
@@ -77,7 +103,7 @@
     "watch": "tsc -watch -p ./",
     "pretest": "npm run compile && npm run lint",
     "lint": "eslint src --ext ts",
-    "test": "node ./out/test/runTest.js"
+    "test": "npm run compile && node --test test/pathValidator.test.js test/schemaValidator.test.js test/anchorValidator.test.js"
   },
   "dependencies": {
     "nanoid": "^3.3.7"

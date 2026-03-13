@@ -183,21 +183,6 @@ body {
   align-items: center;
 }
 
-.mode-select {
-  flex: 1;
-  padding: 6px 8px;
-  background-color: var(--vscode-input-background);
-  color: var(--vscode-input-foreground);
-  border: 1px solid var(--vscode-input-border);
-  border-radius: 3px;
-  font-size: 0.9em;
-  cursor: pointer;
-}
-
-.mode-select:focus {
-  outline: 1px solid var(--vscode-focusBorder);
-}
-
 .primary-button {
   padding: 6px 16px;
   background-color: var(--vscode-button-background);

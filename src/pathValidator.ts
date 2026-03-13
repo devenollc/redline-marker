@@ -27,11 +27,6 @@ export class PathValidator {
         return { valid: false, error: 'Path must be relative to workspace' };
       }
 
-      // Must start with .claude/
-      if (!normalized.startsWith('.claude/') && !normalized.startsWith('.claude\\')) {
-        return { valid: false, error: 'Review files must be within .claude/ directory' };
-      }
-
       // Construct full path and verify it's within workspace
       const fullPath = path.join(workspaceRoot, normalized);
       const relativePath = path.relative(workspaceRoot, fullPath);
@@ -61,7 +56,9 @@ export class PathValidator {
    * Generates review JSON path from source file path.
    */
   static getReviewJsonPath(workspaceRoot: string, sourceFile: string): string {
-    const filename = path.basename(sourceFile, path.extname(sourceFile));
-    return path.join(workspaceRoot, '.claude', 'reviews', `${filename}.review.json`);
+    // Preserve full relative path to avoid collisions (e.g. src/README.md vs docs/README.md)
+    const noExt = sourceFile.replace(/\\/g, '/').replace(/\.md$/i, '');
+    const safe = noExt.replace(/\//g, '__');
+    return path.join(workspaceRoot, '.redline', `${safe}.review.json`);
   }
 }

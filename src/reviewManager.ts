@@ -66,14 +66,11 @@ export class ReviewManager {
         throw new Error(`File not found: ${relativePath}`);
       }
 
-      // Open the document
-      const doc = await vscode.workspace.openTextDocument(absolutePath);
-      await vscode.window.showTextDocument(doc);
-
-      // Load or create review session
+      // Load or create review session BEFORE opening the document so that
+      // provideCommentingRanges finds the session in activeSessions on its
+      // first call (which fires when showTextDocument resolves).
       const review = await this.loadOrCreateReview(relativePath, absolutePath, reviewJsonPath);
 
-      // Store session
       const session: ReviewSession = {
         filePath: relativePath,
         reviewJsonPath,
@@ -81,6 +78,10 @@ export class ReviewManager {
         commentThreads: new Map()
       };
       this.activeSessions.set(relativePath, session);
+
+      // Open the document — provideCommentingRanges now finds the session
+      const doc = await vscode.workspace.openTextDocument(absolutePath);
+      await vscode.window.showTextDocument(doc);
 
       // Validate comment anchors
       const fileLines = doc.getText().split('\n');
@@ -198,9 +199,6 @@ export class ReviewManager {
     comments.push({
       author: {
         name: comment.author === 'claude' ? 'Claude' : comment.authorEmail || 'You',
-        iconPath: comment.author === 'claude'
-          ? vscode.Uri.file(path.join(this.context.extensionPath, 'media', 'claude-icon.png'))
-          : undefined
       },
       body: new vscode.MarkdownString(this.sanitizeMarkdown(comment.body)),
       mode: vscode.CommentMode.Preview,

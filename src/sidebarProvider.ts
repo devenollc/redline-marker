@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import * as path from 'path';
 import { ReviewManager } from './reviewManager';
 import { ClaudeBridge } from './claudeBridge';
-import { FeedbackMode } from './types';
+import { handleError } from './utils/errorHandler';
 
 export class SidebarProvider implements vscode.WebviewViewProvider {
   private view?: vscode.WebviewView;
@@ -30,17 +30,21 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
 
     // Handle messages from webview
     webviewView.webview.onDidReceiveMessage(async (message) => {
-      switch (message.command) {
-        case 'sendToClaude':
-          await this.handleSendToClaude(message.mode, message.filePath);
-          break;
-        case 'resolveComment':
-          await vscode.commands.executeCommand('redline-mark.resolveComment', message.commentId);
-          this.refresh();
-          break;
-        case 'jumpToComment':
-          await this.jumpToComment(message.filePath, message.line);
-          break;
+      try {
+        switch (message.command) {
+          case 'sendToClaude':
+            await this.handleSendToClaude(message.filePath);
+            break;
+          case 'resolveComment':
+            await vscode.commands.executeCommand('redline-mark.resolveComment', message.commentId);
+            this.refresh();
+            break;
+          case 'jumpToComment':
+            await this.jumpToComment(message.filePath, message.line);
+            break;
+        }
+      } catch (error) {
+        handleError('Sidebar action', error);
       }
     });
 
@@ -77,8 +81,7 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
     });
   }
 
-  async handleSendToClaude(mode?: FeedbackMode, filePath?: string): Promise<void> {
-    // Get active editor if no file specified
+  async handleSendToClaude(filePath?: string): Promise<void> {
     if (!filePath) {
       const activeEditor = vscode.window.activeTextEditor;
       if (!activeEditor) {
@@ -94,47 +97,13 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
       return;
     }
 
-    // Prompt for mode if not provided
-    if (!mode) {
-      const selected = await vscode.window.showQuickPick([
-        {
-          label: 'Revise Plan',
-          description: 'Claude rewrites the plan incorporating all comments',
-          mode: 'revise' as FeedbackMode
-        },
-        {
-          label: 'Converse',
-          description: 'Discuss comments with Claude in chat',
-          mode: 'converse' as FeedbackMode
-        },
-        {
-          label: 'New Version',
-          description: 'Create a parallel version preserving the original',
-          mode: 'new_version' as FeedbackMode
-        }
-      ], {
-        placeHolder: 'How should Claude process your feedback?'
-      });
-
-      if (!selected) return;
-      mode = selected.mode;
-    }
-
-    // Update status
-    session.review.claudeFeedback.mode = mode;
+    session.review.claudeFeedback.mode = 'revise';
     session.review.claudeFeedback.sentAt = new Date().toISOString();
     session.review.claudeFeedback.status = 'pending';
     session.review.status = 'sent';
 
-    // Send to Claude
-    await ClaudeBridge.sendToClaude(session.review, mode, this.context);
-
-    // Refresh sidebar
+    await ClaudeBridge.sendToClaude(session.review, this.context);
     this.refresh();
-
-    vscode.window.showInformationMessage(
-      `Sent review to Claude in ${mode} mode`
-    );
   }
 
   private async jumpToComment(filePath: string, line: number): Promise<void> {

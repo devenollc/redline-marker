@@ -15,9 +15,8 @@ export class FileWatcher implements vscode.Disposable {
       return;
     }
 
-    // Watch all .review.json files in .claude/reviews/
     this.watcher = vscode.workspace.createFileSystemWatcher(
-      '**/.claude/reviews/*.review.json'
+      '**/.redline/*.review.json'
     );
 
     this.watcher.onDidChange(async (uri) => {
@@ -43,7 +42,7 @@ export class FileWatcher implements vscode.Disposable {
       // Find corresponding active session
       const sessions = this.reviewManager.getAllActiveSessions();
 
-      for (const [sessionPath, session] of sessions) {
+      for (const [, session] of sessions) {
         if (session.reviewJsonPath === filePath) {
           // Reload review data
           const content = await fs.readFile(filePath, 'utf-8');
