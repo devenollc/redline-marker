@@ -1,104 +1,89 @@
-# Redline Mark — Redline Mark VS Code Extension
+# Redline Mark
 
-**Interactive review of Claude-generated documents with inline, line-level annotations**
+**Inline review for any Markdown file in your project — powered by Claude Code.**
 
-Redline Mark connects Claude.ai chat and Claude Code terminal to a unified review experience inside VS Code, with all data persisted in your project's `.claude/` folder.
+Redline Mark adds a PR-style comment experience to VS Code for Markdown documents. Annotate any `.md` file line by line, persist your feedback across sessions, and send it directly to Claude Code to revise the document.
+
+---
 
 ## Features
 
-- ✅ **Smart Anchoring** — Comments track code even when files change (85% accuracy, 4-tier search)
-- ✅ **Multi-file Support** — Review multiple documents concurrently
-- ✅ **Security Hardened** — Path validation, input sanitization, workspace trust
-- ✅ **File Sync** — Detects external changes to review files
-- ✅ **Complete Threads** — Nested replies, resolve/unresolve, severity levels
-- ✅ **Schema Versioning** — Forward-compatible JSON with auto-migration
+- **Comment on any `.md` file** — open any Markdown file in review mode and click `+` in the gutter to add inline comments
+- **Persistent reviews** — comments are saved to `.redline/` in your project and survive reloads
+- **Send to Claude** — packages all open comments into a structured prompt and dispatches to Claude Code via terminal
+- **Smart anchoring** — comments track their location even after the file is revised (4-tier search, ~85% accuracy)
+- **Sidebar overview** — see all active reviews, open/resolved comment counts, and jump to any comment
+- **Configurable exclusions** — block files from the picker via `redlineMark.excludePatterns` in Settings
 
-## Quick Start
+---
 
-### Installation
+## Usage
 
-```bash
-# Install dependencies
-npm install
+### 1. Open a file for review
+```
+Cmd+Shift+P → "Redline Mark: Open in Redline Mark Mode"
+```
+Pick any `.md` file from the workspace. Gutter `+` icons appear on every line.
 
-# Compile the extension
-npm run compile
+### 2. Add a comment
+Click `+` next to a line → type your feedback → click **Add Comment**.
 
-# Run in development mode
-code .
-# Press F5 to launch Extension Development Host
+### 3. Send to Claude
+Click **Send to Claude** in the Redline Mark sidebar. Claude Code opens in a terminal and revises the file incorporating your comments.
+
+### 4. From Claude.ai chat
+Claude can generate a direct link to open a file in review mode:
+```
+[Open in VS Code for Review](vscode://redline-mark/open?file=.claude/plans/plan.md)
 ```
 
-### Usage
+---
 
-**From Claude Code Terminal:**
-```bash
-/review plans/auth-implementation.md
+## Review Data
+
+Comments are stored in `.redline/` at the workspace root (gitignored by default):
+
+```
+.redline/
+  docs__architecture.review.json
+  .claude__plans__auth-implementation.review.json
 ```
 
-**From Claude.ai Chat:**
-Claude will automatically generate review links like:
-```
-[Open in VS Code for Review](vscode://redline-mark/open?file=plans/plan.md)
-```
+---
 
-**From VS Code:**
-1. Open Command Palette (Cmd+Shift+P)
-2. Run "Redline Mark: Open in Review Mode"
-3. Select a file from `.claude/` directory
+## Settings
 
-## How It Works
+| Setting | Default | Description |
+|---------|---------|-------------|
+| `redlineMark.excludePatterns` | `[]` | Glob patterns to exclude from the file picker |
+| `claudeReview.autoSave` | `true` | Auto-save comments on change |
+| `claudeReview.debounceMs` | `1000` | File write debounce delay (ms) |
+| `claudeReview.enableFileWatcher` | `true` | Watch `.redline/` for external changes |
 
-1. **Create reviews** — Use `/review` command or click links from Claude.ai
-2. **Add comments** — Click on any line to add inline comments with severity levels
-3. **Collaborate** — Reply to comments, mark as resolved
-4. **Send feedback** — Use "Send to Claude" button to:
-   - **Revise** — Claude rewrites the plan incorporating comments
-   - **Converse** — Discuss comments in Claude.ai chat
-   - **New Version** — Create parallel version preserving original
-
-## Review Data Structure
-
-Reviews are stored as JSON files in `.claude/reviews/`:
-
+**Example — exclude changelog and generated docs:**
 ```json
-{
-  "file": ".claude/plans/auth-implementation.md",
-  "status": "in_review",
-  "comments": [
-    {
-      "line": 24,
-      "severity": "question",
-      "body": "What auth strategy are we using?",
-      "author": "user",
-      "resolved": false
-    }
-  ]
-}
+"redlineMark.excludePatterns": [
+  "**/CHANGELOG.md",
+  "docs/generated/**"
+]
 ```
 
-## Development
+---
 
-```bash
-# Compile TypeScript
-npm run compile
+## Requirements
 
-# Watch mode (auto-compile on save)
-npm run watch
+- VS Code 1.85+
+- [Claude Code](https://claude.ai/claude-code) installed and on your PATH (for "Send to Claude")
 
-# Package for distribution
-vsce package
-```
+---
 
 ## Documentation
 
 - [CLAUDE.md](CLAUDE.md) — Project overview and quick reference
 - [techSpec.md](techSpec.md) — Full technical specification
 
-## License
-
-MIT License — See [LICENSE](LICENSE) file for details
-
 ---
 
-**Built with ❤️ by Deveno LLC**
+## License
+
+MIT — Built by [Voxnotes](https://voxnotes.xyz)

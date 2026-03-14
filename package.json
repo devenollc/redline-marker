@@ -1,7 +1,7 @@
 {
   "name": "redline-mark",
   "displayName": "Redline Mark",
-  "description": "VS Code Extension for Interactive Review of Claude-Generated Documents",
+  "description": "Inline Markdown review with Claude Code — annotate any .md file, persist comments, send feedback back to Claude.",
   "version": "0.2.0",
   "publisher": "voxnotes",
   "icon": "media/redlinemark.png",
@@ -118,7 +118,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/devenollc/redline-mark.git"
+    "url": "https://github.com/devenollc/redline-marker.git"
   },
   "license": "MIT"
 }
